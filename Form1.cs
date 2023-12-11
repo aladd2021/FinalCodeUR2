@@ -102,7 +102,6 @@ namespace FinalCode
                 CvInvoke.CvtColor(binaryMat, decoratedMat, typeof(Gray), typeof(Bgr));
                 resizePicBoxes(sourceMat, blurredMat, binaryMat, decoratedMat);
                 processShapes(binaryMat, decoratedMat);
-                drivingDistsAndAngles(pixPerIn, decoratedMat);
                 displayShapeData();
 
                 if (enableCoordinateSending)
@@ -264,43 +263,7 @@ namespace FinalCode
             }
         }
 
-        private void drivingDistsAndAngles(int pixPerIn, Mat frame)
-        {
 
-            Point centerBorder = new Point(0, 0);
-            if (shapeInfo.Count > 1)
-            {
-                foreach (Shape shape in shapeInfo)
-                {
-                    if (shape.shapeType == 2)
-                    {
-                        centerBorder = shape.center;
-                    }
-                }
-                //Creates virtual point 9 inches from the center of the border, which is the paper.
-                Point robotbase = new Point(centerBorder.X, centerBorder.Y + (pixPerIn * 9));
-                string str = $"Base Center @ x:{robotbase.X} y:{robotbase.Y}";
-                CvInvoke.PutText(frame, str, robotbase, FontFace.HersheyPlain, 0.8, new Bgr(Color.Red).MCvScalar);
-
-                //Stores values in inches and degrees.
-                for (int i = 0; i < (shapeInfo.Count); i++)
-                {
-                    double deltaX = shapeInfo[i].center.X - robotbase.X;
-                    double deltaY = shapeInfo[i].center.Y - robotbase.Y;
-                    double angleRad = Math.Atan(deltaY / deltaX);
-                    double angleDeg = (angleRad * 180) / Math.PI;
-                    if (angleDeg < 0)
-                    {
-                        angleDeg = 180 + angleDeg;
-                    }
-                    if (angleDeg > 0)
-                    {
-                        shapeInfo[i].drivingAngle = Convert.ToInt32(angleDeg);
-                        shapeInfo[i].drivingDist = Convert.ToInt32(Math.Sqrt(Math.Pow(deltaX, 2) + Math.Pow(deltaY, 2)) / pixPerIn);
-                    }
-                }
-            }
-        }
         private void displayShapeData()
         {
             if (shapeInfo.Count > 1)
